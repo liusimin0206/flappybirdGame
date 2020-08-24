@@ -1,3 +1,6 @@
+// vue.config.js
+const ENV = process.env.NODE_ENV;
+
 module.exports = {
-  publicPath: ""
+  publicPath: ENV === "development" ? "" : "./dist/"
 };
