@@ -85,7 +85,7 @@ export default {
   background-size: auto 100%;
   // background-repeat: no-repeat;
   background-attachment: fixed;
-  transition: background-position-x 0.03s linear;
+  // transition: background-position-x 0.03s linear;
   overflow: hidden;
 }
 </style>
