@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import Store from "../assets/store";
+import localStorage from "../assets/localStorage";
 export default {
   data() {
     return {
@@ -27,7 +27,7 @@ export default {
     };
   },
   mounted() {
-    this.gameRecording = Store.fetch();
+    this.gameRecording = localStorage.fetch();
     if (this.gameRecording === null) {
       this.gameRecording = [];
     }
@@ -50,7 +50,7 @@ export default {
       return `${year}.${month}.${day} ${hour}:${minute}:${second}`;
     },
     save(record) {
-      Store.save(record);
+      localStorage.save(record);
     },
     createAScoreRecord() {
       return { score: this.lastScore, time: this.getDate() };

@@ -1,12 +1,10 @@
 <template>
-  <div id="app" :style="{ backgroundPositionX: backgroundMoveXStr }">
+  <div id="app" :style="{ backgroundPositionX: num2strAddPx(backgroundMoveX) }">
     <StartGame
-      :handleTimes="this.handleTimes"
       @StartGame="handleStartGame"
       v-if="!isStartGame && !isOverGame"
     ></StartGame>
     <PlayingGame
-      :handleTimes="this.handleTimes"
       :isStartGame="isStartGame"
       :backgroundMoveSpeed="backgroundMoveSpeed"
       v-if="isStartGame && !isOverGame"
@@ -21,12 +19,14 @@
 </template>
 
 <script>
-import StartGame from "@/components/StartGame";
-import EndGame from "@/components/EndGame";
-import PlayingGame from "@/components/PlayingGame";
+import { num2strAddPx } from "./tools";
 export default {
   name: "App",
-  components: { StartGame, EndGame, PlayingGame },
+  components: {
+    StartGame: () => import("@/components/StartGame"),
+    EndGame: () => import("@/components/EndGame"),
+    PlayingGame: () => import("@/components/PlayingGame")
+  },
   data() {
     return {
       backgroundMoveSpeed: 2,
@@ -38,21 +38,21 @@ export default {
       lastScore: -1
     };
   },
-  created() {
+  mounted() {
     this.init();
-  },
-  computed: {
-    backgroundMoveXStr: function() {
-      return this.backgroundMoveX + "px";
-    }
   },
   methods: {
     init() {
-      this.handleTimes = 0;
+      this.$store.commit("reset");
       this.timer = setInterval(() => {
-        this.handleTimes++;
-        this.backgroundMoveX -= this.backgroundMoveSpeed;
+        this.$store.commit("increment");
+        if (!this.isStartGame) {
+          this.moveBackground();
+        }
       }, 30);
+    },
+    moveBackground() {
+      this.backgroundMoveX -= this.backgroundMoveSpeed;
     },
     handleStartGame(val) {
       this.isStartGame = val;
@@ -69,7 +69,8 @@ export default {
       this.init();
       this.isStartGame = true;
       this.isOverGame = false;
-    }
+    },
+    num2strAddPx
   }
 };
 </script>

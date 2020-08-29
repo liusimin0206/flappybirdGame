@@ -5,30 +5,37 @@
       <div v-for="(pipe, i) in pipeData" class="pipe" :key="i">
         <div
           class="pipeUp"
-          :style="{ top: addPx(pipe.upY), left: addPx(pipe.left) }"
+          :style="{
+            top: num2strAddPx(pipe.upY),
+            left: num2strAddPx(pipe.left)
+          }"
         ></div>
         <div
           class="pipeDown"
-          :style="{ top: addPx(pipe.downY), left: addPx(pipe.left) }"
+          :style="{
+            top: num2strAddPx(pipe.downY),
+            left: num2strAddPx(pipe.left)
+          }"
         ></div>
       </div>
-      <div class="locateY" :style="{ top: locateY2Str }">
-        <Bird
-          :isStartGame="isStartGame"
-          :isActive="isActive"
-          :isStartbirdJump="false"
-        ></Bird>
-      </div>
+      <Bird
+        ref="Bird"
+        :class="{ nojump: true }"
+        :style="{
+          top: num2strAddPx(this.topOfBird)
+        }"
+      ></Bird>
     </div>
   </div>
 </template>
 
 <script>
 import Bird from "./Bird";
+import { num2strAddPx } from "../tools";
 export default {
   data() {
     return {
-      locateY: 0,
+      topOfBird: 0,
       dropStepY: 0,
       bodyHeight: 1000,
       pipeYDistance: 150,
@@ -36,7 +43,10 @@ export default {
       pipeLength: 10,
       score: 0,
       currentPipeIndex: 0,
-      isClick: false
+      isClick: false,
+      pipeWidth: 52,
+      maxTopOfBird: 50,
+      minTopOfBird: 0
     };
   },
   components: { Bird },
@@ -45,23 +55,28 @@ export default {
       if (!this.isClick) this.isClick = true;
       this.dropStepY = -10;
     },
-    dropLocateY() {
-      this.locateY += ++this.dropStepY;
+    // 匀加速下落
+    droptopOfBird() {
+      this.topOfBird += ++this.dropStepY;
     },
     judgeKnock() {
       this.judgeBoundary();
-
       this.judgePipe();
     },
+    // 检测是否超出上下界限
     judgeBoundary() {
-      if (this.locateY <= this.minTop || this.locateY >= this.maxTop) {
+      if (this.topOfBird <= this.minTop || this.topOfBird >= this.maxTop) {
         this.failGame();
       }
     },
+    // 检测是否撞上单对柱子
     judgeSinglePipe(pipe) {
-      if (pipe.left <= 15 && pipe.left >= -67) {
+      if (pipe.left <= 30 && pipe.left >= -this.pipeWidth) {
         if (
-          !(this.locateY >= pipe.upY + 852 && this.locateY + 30 <= pipe.downY)
+          !(
+            this.topOfBird >= pipe.upY + 852 &&
+            this.topOfBird + 30 <= pipe.downY
+          )
         ) {
           this.failGame();
         }
@@ -87,9 +102,7 @@ export default {
         this.pipeData[i].left -= this.backgroundMoveSpeed;
       }
     },
-    addPx(num) {
-      return num + "px";
-    },
+    num2strAddPx,
     addDeletePipe() {
       //   移除第一根柱子;
       let firstPipe = this.pipeData.shift();
@@ -112,24 +125,21 @@ export default {
     }
   },
   computed: {
-    isActive() {
-      return this.handleTimes % 10 === 0;
-    },
-    locateY2Str() {
-      return this.locateY + "px";
-    },
     minTop() {
       return -(this.bodyHeight / 2 - 10);
     },
     maxTop() {
       return this.bodyHeight / 2 + 10;
+    },
+    time30: function() {
+      return this.$store.state.counter;
     }
   },
   watch: {
-    handleTimes() {
+    time30(val) {
       if (this.isClick) {
         this.pipeMove();
-        this.dropLocateY();
+        this.droptopOfBird();
         if (this.pipeData[0].left <= -1000) {
           this.addDeletePipe();
           this.currentPipeIndex--;
@@ -139,6 +149,9 @@ export default {
           this.score++;
           this.currentPipeIndex++;
         }
+      }
+      if (val % 10 == 0) {
+        this.$refs.Bird.flapWings();
       }
     }
   }
@@ -177,8 +190,13 @@ export default {
       height: 852px;
       background-image: url("../assets/img/pipe1.png");
     }
-    .locateY {
+    .bird {
       position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .bird.nojump {
+      transition: all 0s ease 0s;
     }
   }
 }

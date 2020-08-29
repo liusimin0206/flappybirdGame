@@ -2,11 +2,10 @@
   <div class="startGame">
     <div class="title">
       <Bird
-        :isStartGame="isStartGame"
-        :isActive="isActive"
-        :isStartbirdJump="!isStartGame"
-        :minTopOfBird="0"
-        :maxTopOfBird="50"
+        ref="Bird"
+        :style="{
+          top: this.topOfBirdStr
+        }"
       ></Bird>
       <div
         class="startGameButton"
@@ -21,12 +20,15 @@
 
 <script>
 import Bird from "./Bird";
+import { num2strAddPx } from "../tools";
 export default {
   data() {
     return {
       isStartGame: false,
-
-      switchtruthiness: true
+      switchtruthiness: true,
+      topOfBird: 0,
+      maxTopOfBird: 50,
+      minTopOfBird: 0
     };
   },
   components: {
@@ -40,23 +42,33 @@ export default {
       this.isStartGame = true;
       this.$emit("StartGame", true);
     },
+    // "开始游戏"文字变化
     startBound() {
       this.switchtruthiness = !this.switchtruthiness;
-    }
-  },
-  watch: {
-    isActive: function(newVal) {
-      if (newVal) {
-        this.startBound();
-      }
+    },
+    startbirdJump() {
+      this.topOfBird =
+        this.topOfBird === this.maxTopOfBird
+          ? this.minTopOfBird
+          : this.maxTopOfBird;
     }
   },
   computed: {
     topOfBirdStr: function() {
-      return this.topOfBird + "px";
+      return num2strAddPx(this.topOfBird);
     },
-    isActive() {
-      return this.handleTimes % 10 === 0;
+
+    time300: function() {
+      return this.$store.getters.counter10;
+    }
+  },
+  watch: {
+    time300: function() {
+      // "开始游戏"文字变化
+      this.startBound();
+      // 小鸟扇动翅膀
+      this.$refs.Bird.flapWings();
+      this.startbirdJump();
     }
   }
 };
@@ -71,7 +83,11 @@ export default {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-
+    .bird {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
     .startGameButton {
       position: absolute;
       width: 150px;
