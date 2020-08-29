@@ -6,7 +6,6 @@
     ></StartGame>
     <PlayingGame
       :isStartGame="isStartGame"
-      :backgroundMoveSpeed="backgroundMoveSpeed"
       v-if="isStartGame && !isOverGame"
       @gameOver="handleGameOver"
     ></PlayingGame>
@@ -47,16 +46,15 @@ export default {
       this.timer = setInterval(() => {
         this.$store.commit("increment");
         if (!this.isStartGame) {
-          this.moveBackground();
+          this.moveBackground(this.backgroundMoveSpeed);
         }
       }, 30);
     },
-    moveBackground() {
-      this.backgroundMoveX -= this.backgroundMoveSpeed;
+    moveBackground(moveSpeed) {
+      this.backgroundMoveX -= moveSpeed;
     },
     handleStartGame(val) {
       this.isStartGame = val;
-      this.backgroundMoveSpeed = 5;
     },
     // eslint-disable-next-line no-unused-vars
     handleGameOver(val, score) {

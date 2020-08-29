@@ -36,6 +36,8 @@ export default {
   data() {
     return {
       topOfBird: 0,
+      maxTopOfBird: 50,
+      minTopOfBird: 0,
       dropStepY: 0,
       bodyHeight: 1000,
       pipeYDistance: 150,
@@ -45,8 +47,7 @@ export default {
       currentPipeIndex: 0,
       isClick: false,
       pipeWidth: 52,
-      maxTopOfBird: 50,
-      minTopOfBird: 0
+      speedX: 5
     };
   },
   components: { Bird },
@@ -99,7 +100,7 @@ export default {
     },
     pipeMove() {
       for (var i = 0; i < this.pipeLength; i++) {
-        this.pipeData[i].left -= this.backgroundMoveSpeed;
+        this.pipeData[i].left -= this.speedX;
       }
     },
     num2strAddPx,
@@ -113,10 +114,7 @@ export default {
     }
   },
   props: {
-    isStartGame: Boolean,
-    handleTimes: Number,
-    appClick: Boolean,
-    backgroundMoveSpeed: { type: Number, default: 5 }
+    isStartGame: { type: Boolean, default: true }
   },
   mounted() {
     this.bodyHeight = document.body.scrollHeight;
@@ -137,7 +135,7 @@ export default {
   },
   watch: {
     time30(val) {
-      this.$parent.moveBackground();
+      this.$parent.moveBackground(this.speedX);
       if (this.isClick) {
         this.pipeMove();
         this.droptopOfBird();
