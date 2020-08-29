@@ -137,9 +137,9 @@ export default {
   },
   watch: {
     time30(val) {
+      this.$parent.moveBackground();
       if (this.isClick) {
         this.pipeMove();
-        this.$parent.moveBackground();
         this.droptopOfBird();
         if (this.pipeData[0].left <= -1000) {
           this.addDeletePipe();
